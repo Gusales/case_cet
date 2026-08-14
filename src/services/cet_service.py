@@ -1,8 +1,9 @@
 from decimal import Decimal
-from cet_rate_solver import CetRateSolver
 
 from src.dtos.cet_request_calculate_dto import CetRequestCalculateDto
 from src.dtos.cet_response_calculate_dto import CetResponseCalculateDto
+
+from src.services.cet_rate_solver import CetRateSolver
 
 class CetService:
 
