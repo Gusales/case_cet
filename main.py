@@ -10,14 +10,14 @@ def main():
     try:
         dados: CetRequestCalculateDto = {
             "valor_solicitado": Decimal(input("Valor solicitado: ")),
-            "taxa_juros_mensal": Decimal(input("Taxa de juros mensal: ")),
+            "taxa_juros_mensal": Decimal(input("Taxa de juros mensal (%): ")) / 100,
             "prazo": int(input("Prazo (meses): ")),
-            "iof": Decimal(input("IOF: ")),
+            "iof": Decimal(input("IOF (%): ")) / 100,
             "tarifa_cadastrada": Decimal(input("Tarifa cadastrada (R$): ")),
         }
 
         UserInputValidator().validate(dados)
-        
+
         resultado = cet_service.calcula_cet(dados)
 
         print(resultado)
