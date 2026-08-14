@@ -27,7 +27,7 @@ class ColoredFormatter(logging.Formatter):
 
 handler = logging.StreamHandler()
 handler.setFormatter(ColoredFormatter(
-    fmt='%(asctime)s %(levelname)-8s %(message)s',
+    fmt='%(asctime)s %(levelname)-8s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 ))
 
@@ -68,7 +68,7 @@ class Logger(logging.LoggerAdapter):
         finally:
             del frame
 
-        return f"- [{self._cls_name}.{method_name}] - {msg}", kwargs
+        return f"[{self._cls_name}.{method_name}] - {msg}", kwargs
 
     def get_logger(self):
         return self.logger

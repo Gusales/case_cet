@@ -25,10 +25,9 @@ def main():
         resultado = cet_service.calcula_cet(dados)
 
         logger.info("Cálculo concluído com sucesso.")
-        print(resultado)
+        logger.info(resultado)
     except ValueError as e:
         logger.error(f"Erro de validação: {e}")
-        print(f"Erro de validação: {e}")
 
 if __name__ == '__main__':
     main()
