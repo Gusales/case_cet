@@ -27,21 +27,6 @@ class CetService:
         self._logger.info(f"O resultado do 'pmt' é {pmt}")
         return pmt
 
-    def _valida_intervalo(self, r_candidato: Decimal, x: Decimal, y: Decimal) -> bool:
-        if r_candidato is None:
-            self._logger.debug("Candidato inválido: valor nulo.")
-            return False
-
-        if r_candidato <= Decimal("-1"):
-            self._logger.debug(f"Candidato inválido: {r_candidato} deixaria (1 + r) menor ou igual a zero.")
-            return False
-
-        if r_candidato <= x or r_candidato >= y:
-            self._logger.debug(f"Candidato inválido: {r_candidato} está fora do intervalo [{x}, {y}].")
-            return False
-
-        return True
-
     def calcula_principal(self, valor_solicitado: Decimal, iof: Decimal, tarifa_cadastrada: Decimal) -> Decimal:
         self._logger.info("Calculando o valor multiplicado ao iof")
         valor_iof = valor_solicitado * iof
