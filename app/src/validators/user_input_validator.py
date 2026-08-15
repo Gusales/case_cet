@@ -1,5 +1,5 @@
-from src.dtos.cet_request_calculate_dto import CetRequestCalculateDto
-from src.utils.logger import Logger
+from app.src.dtos.cet_request_calculate_dto import CetRequestCalculateDto
+from app.src.utils.logger import Logger
 
 class UserInputValidator:
 

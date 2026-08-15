@@ -1,10 +1,10 @@
 from decimal import Decimal
 
-from src.dtos.cet_request_calculate_dto import CetRequestCalculateDto
-from src.dtos.cet_response_calculate_dto import CetResponseCalculateDto
+from app.src.dtos.cet_request_calculate_dto import CetRequestCalculateDto
+from app.src.dtos.cet_response_calculate_dto import CetResponseCalculateDto
 
-from src.services.cet_rate_solver import CetRateSolver
-from src.utils.logger import Logger
+from app.src.services.cet_rate_solver import CetRateSolver
+from app.src.utils.logger import Logger
 
 class CetService:
     def __init__(self):
