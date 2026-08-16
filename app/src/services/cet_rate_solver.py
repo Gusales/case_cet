@@ -1,6 +1,6 @@
 from decimal import Decimal, InvalidOperation
 
-from app.src.utils.logger import Logger
+from src.utils.logger import Logger
 
 class CetRateSolver:
     """
