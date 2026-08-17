@@ -154,10 +154,6 @@ exigido pelo `main.py`, então a CLI e a suíte de testes rodam sem ele.
     A function fica disponível em
     `http://localhost:5001/<seu-projeto>/us-central1/lambda_handler`.
 
-> 📖 O passo a passo completo de configuração e deploy — `firebase.json`, `.firebaserc`,
-> escolha de runtime e os erros mais comuns — está em
-> [`docs/DEPLOY_FIREBASE_FUNCTIONS.md`](docs/DEPLOY_FIREBASE_FUNCTIONS.md).
-
 ### Modo CLI
 
 O mesmo núcleo de cálculo continua acessível pelo terminal, sem precisar de Firebase nem de
@@ -215,7 +211,7 @@ Ou seja: parcela de **R$ 569,64**, total pago de **R$ 13.671,36**, e um CET de *
 | `tarifa_cadastrada` | número ou string numérica | Reais (R$) |
 
 ```bash
-curl -X POST https://lambda-bedrock-analytics.web.app/calcula_cet \
+curl -X POST https://us-central1-lambda-bedrock-analytics.cloudfunctions.net/calcula_cet \
   -H "Content-Type: application/json" \
   -d '{
         "valor_solicitado": 10000,
