@@ -1,14 +1,15 @@
 # 💰 Case CET
 
 ![Python Version](https://img.shields.io/badge/python-3.11%2B-blue?logo=python)
+![Firebase Functions](https://img.shields.io/badge/Firebase_Functions-0.6%2B-FFCA28?logo=firebase)
+![Architecture](https://img.shields.io/badge/Architecture-Serverless-orange)
 ![pytest](https://img.shields.io/badge/pytest-8.4-0A9EDC?logo=pytest)
 ![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen)
-![Tests](https://img.shields.io/badge/tests-92%20passing-brightgreen)
-![Dependencies](https://img.shields.io/badge/runtime_deps-zero-lightgrey)
+![Tests](https://img.shields.io/badge/tests-120%20passing-brightgreen)
 
 > **Calculadora de Custo Efetivo Total para empréstimos pessoais.**
 >
-> Recebe as condições de um empréstimo pela linha de comando e devolve a parcela mensal pela Tabela Price, o valor total pago e o CET mensal e anual — este último resolvido numericamente por Newton-Raphson com fallback de bissecção. Toda a aritmética monetária usa `Decimal`, sem ponto flutuante em nenhum ponto do caminho.
+> Exposta como uma Firebase Cloud Function, a API recebe as condições de um empréstimo e devolve a parcela mensal pela Tabela Price, o valor total pago e o CET mensal e anual — este último resolvido numericamente por Newton-Raphson com fallback de bissecção. Toda a aritmética monetária usa `Decimal`, sem ponto flutuante em nenhum ponto do caminho.
 
 ---
 
@@ -19,6 +20,7 @@
 - [O que é calculado](#-o-que-é-calculado)
 - [Tech Stack](#-tech-stack)
 - [Como Executar](#-como-executar)
+- [API](#-api)
 - [Testes](#-testes)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
 
@@ -30,16 +32,25 @@ O **Case CET** resolve o problema de traduzir as condições nominais de um empr
 
 O sistema recebe cinco entradas, valida cada uma, monta o principal financiado, calcula a parcela pela Tabela Price e então busca numericamente a taxa que iguala o valor presente das parcelas ao valor efetivamente recebido.
 
+O núcleo de cálculo é independente do meio de entrada: a mesma `src/` atende tanto a **Cloud Function** (`main.py`) quanto a **CLI** (`local-debug/main.py`), que continua disponível para uso local.
+
 ---
 
 ## 🏗 Arquitetura
 
 ```
-Entrada do usuário (CLI)
-    │
-    ▼
-main.py
-    │
+Cliente HTTP                              Terminal
+    │                                         │
+    ▼                                         ▼
+main.py                                local-debug/main.py
+(Firebase Cloud Function)                    (CLI)
+    │                                         │
+    ├── HttpRequestValidator                  │
+    │       └── Valida o JSON, converte       │
+    │          percentuais e monta o DTO      │
+    │                                         │
+    └───────────────┬─────────────────────────┘
+                    ▼
     ├── UserInputValidator
     │       └── Recusa valor ≤ 0, taxa < 0, prazo ≤ 0, IOF ou tarifa negativos
     │
@@ -54,9 +65,18 @@ main.py
     │                         ├── _candidato_valido() → valida cada passo
     │                         └── Bissecção         → fallback quando o passo é inválido
     │
+    ├── DecimalEncoder
+    │       └── Serializa Decimal como string, preservando a precisão no JSON
+    │
     └── Logger
             └── Prefixa cada mensagem com [Classe.método] via inspeção de stack
 ```
+
+A validação é dividida em duas camadas de propósito: o `HttpRequestValidator` cuida do
+transporte (JSON bem formado, campos presentes, tipos convertíveis) e o `UserInputValidator`
+cuida da regra de negócio. É o que permite distinguir "JSON malformado" de "empréstimo
+inválido" — e é também o que mantém o `UserInputValidator` reutilizado sem alteração entre a
+CLI e a function.
 
 O `CetRateSolver` não reinicia a busca ao cair para a bissecção: ele aproveita o intervalo `[baixo, alto]` já reduzido pelas iterações anteriores.
 
@@ -84,11 +104,16 @@ O retorno inclui metadados da execução (`iteracoes`, `usos_fallback`, `erro_fi
 
 ## 🚀 Tech Stack
 
-- **Linguagem:** Python 3.11+ (desenvolvido em 3.14.6)
+- **Linguagem:** Python 3.11+
+- **Serverless:** Firebase Cloud Functions (`firebase_functions`) — 2ª geração
+- **Framework HTTP:** Flask (via `firebase-functions`)
+- **Deploy:** Firebase CLI
 - **Aritmética:** `decimal.Decimal` — precisão de 28 dígitos, sem ponto flutuante
 - **Tipagem:** `TypedDict` para os DTOs, `Unpack` nos stubs de teste
 - **Testes:** pytest 8.4 + pytest-cov 6.0
-- **Dependências de runtime:** nenhuma — só biblioteca padrão
+
+O núcleo em `src/` não depende de nada além da biblioteca padrão. O `firebase-functions` só é
+exigido pelo `main.py`, então a CLI e a suíte de testes rodam sem ele.
 
 ---
 
@@ -97,6 +122,8 @@ O retorno inclui metadados da execução (`iteracoes`, `usos_fallback`, `erro_fi
 ### Pré-requisitos
 
 - Python 3.11 ou superior
+- [Firebase CLI](https://firebase.google.com/docs/cli) instalado (para o emulador e o deploy)
+- Projeto Firebase criado
 
 ### Passo a Passo
 
@@ -113,14 +140,34 @@ O retorno inclui metadados da execução (`iteracoes`, `usos_fallback`, `erro_fi
     .venv\Scripts\activate      # Windows
     ```
 
-3. **Execute a aplicação:**
+3. **Instale as dependências:**
     ```bash
-    python main.py
+    pip install -r requirements.txt
     ```
 
-    _A aplicação não tem dependências de runtime. O `requirements-dev.txt` só é necessário para rodar os testes._
+4. **Execute localmente com o emulador:**
+    ```bash
+    firebase emulators:start --only functions
+    ```
 
-### Exemplo de execução
+    A function fica disponível em
+    `http://localhost:5001/<seu-projeto>/us-central1/lambda_handler`.
+
+> 📖 O passo a passo completo de configuração e deploy — `firebase.json`, `.firebaserc`,
+> escolha de runtime e os erros mais comuns — está em
+> [`docs/DEPLOY_FIREBASE_FUNCTIONS.md`](docs/DEPLOY_FIREBASE_FUNCTIONS.md).
+
+### Modo CLI
+
+O mesmo núcleo de cálculo continua acessível pelo terminal, sem precisar de Firebase nem de
+nenhuma dependência externa. A partir de `app/`:
+
+```bash
+python -m local-debug.main
+```
+
+> O `-m` é necessário: executar `python local-debug/main.py` coloca `local-debug/` no
+> `sys.path` em vez de `app/`, e os imports de `src` falham.
 
 O programa pede as cinco entradas em sequência. Usando o caso de referência do desafio:
 
@@ -152,6 +199,66 @@ Ou seja: parcela de **R$ 569,64**, total pago de **R$ 13.671,36**, e um CET de *
 
 ---
 
+## 🔌 API
+
+`POST /` · `Content-Type: application/json`
+
+### Requisição
+
+| Campo | Tipo | Unidade |
+| :--- | :--- | :--- |
+| `valor_solicitado` | número ou string numérica | Reais (R$) |
+| `taxa_juros_mensal` | número ou string numérica | Percentual (`2.5` = 2,5% a.m.) |
+| `prazo` | inteiro | Meses |
+| `iof` | número ou string numérica | Percentual (`0.38` = 0,38%) |
+| `tarifa_cadastrada` | número ou string numérica | Reais (R$) |
+
+```bash
+curl -X POST https://lambda-bedrock-analytics.web.app/calcula_cet \
+  -H "Content-Type: application/json" \
+  -d '{
+        "valor_solicitado": 10000,
+        "taxa_juros_mensal": 2.5,
+        "prazo": 24,
+        "iof": 0.38,
+        "tarifa_cadastrada": 150
+      }'
+```
+
+### Resposta — `200 OK`
+
+```json
+{
+  "data": {
+    "principal_financiado": "10188.0000",
+    "pmt": "569.6398138287249351997965382",
+    "valor_total_pago": "13671.35553188939844479511692",
+    "cet_mensal": "0.02669314049967152600841711547",
+    "cet_anual": "0.371790924403756286261650645"
+  }
+}
+```
+
+> **Por que os valores saem como string:** converter `Decimal` para `float` no JSON
+> desfaria o motivo de o projeto inteiro usar `Decimal`. String é lossless — o consumidor
+> decide como interpretar e arredondar.
+
+### Erros
+
+| Status | Quando | Exemplo de resposta |
+| :---: | :--- | :--- |
+| `400` | Corpo ausente ou JSON malformado | `{"message": "O corpo da requisição deve ser um JSON válido."}` |
+| `400` | Campo obrigatório faltando | `{"message": "Campos obrigatórios ausentes: iof, tarifa_cadastrada."}` |
+| `400` | Valor não numérico | `{"message": "Campo 'valor_solicitado' deve ser um número. Recebido: 'abc'."}` |
+| `400` | Regra de negócio violada | `{"message": "Valor solicitado deve ser positivo."}` |
+| `405` | Método diferente de `POST` | `{"message": "Método não permitido. Use POST."}` |
+| `500` | Falha inesperada | `{"message": "Erro interno ao processar a requisição."}` |
+
+O `204 No Content` é devolvido para o preflight `OPTIONS`. CORS está liberado para qualquer
+origem (`Access-Control-Allow-Origin: *`).
+
+---
+
 ## 🧪 Testes
 
 Instale as dependências de desenvolvimento:
@@ -160,17 +267,20 @@ Instale as dependências de desenvolvimento:
 pip install -r requirements-dev.txt
 ```
 
-A suíte tem **92 testes** e **98% de cobertura** sobre `src/`. Todos os comandos abaixo rodam a partir de `app/`.
+A suíte tem **120 testes** e **98% de cobertura** sobre `src/`. Todos os comandos abaixo rodam a partir de `app/`.
+
+Os testes não dependem do `firebase-functions`: a lógica de parsing da requisição e de
+serialização vive em `src/`, e o `main.py` é só o invólucro HTTP.
 
 ### Testes unitários
 
-Cobrem cada service, validator e utilitário isoladamente — as fórmulas financeiras, os ramos de guarda do solver, as fronteiras do validator e a formatação do logger.
+Cobrem cada service, validator e utilitário isoladamente — as fórmulas financeiras, os ramos de guarda do solver, as fronteiras do validator, o parsing do corpo HTTP, a serialização dos `Decimal` e a formatação do logger.
 
 ```bash
 pytest -m unit
 ```
 
-<sub>70 testes</sub>
+<sub>98 testes</sub>
 
 ### Testes e2e
 
@@ -215,8 +325,11 @@ case_cet/
 │   ├── PERSONAS.md                                  # Casos de uso, derivações e passo a passo
 │   └── USO_DE_IA_NO_DESENVOLVIMENTO.md              # Registro do uso de IA no projeto
 └── app/
-    ├── main.py                                      # Entrypoint da CLI
+    ├── main.py                                      # Cloud Function (entrypoint do Firebase)
+    ├── local-debug/
+    │   └── main.py                                  # CLI, para execução local
     ├── pytest.ini                                   # Config do pytest e markers
+    ├── requirements.txt                             # Dependências da function
     ├── requirements-dev.txt                         # Dependências de teste
     ├── src/
     │   ├── dtos/
@@ -226,8 +339,10 @@ case_cet/
     │   │   ├── cet_service.py                       # Principal, PMT e orquestração do CET
     │   │   └── cet_rate_solver.py                   # Newton-Raphson + fallback de bissecção
     │   ├── validators/
-    │   │   └── user_input_validator.py              # Validação das entradas do usuário
+    │   │   ├── http_request_validator.py            # Parsing e conversão do corpo JSON
+    │   │   └── user_input_validator.py              # Regras de negócio das entradas
     │   └── utils/
+    │       ├── json_encoder.py                      # Serializa Decimal sem perder precisão
     │       └── logger.py                            # Logger colorido com prefixo [Classe.método]
     └── tests/
         ├── conftest.py                              # Fixtures das personas e comparadores

@@ -1,0 +1,23 @@
+{
+  "functions": [
+    {
+      "source": "app",
+      "codebase": "default",
+      "runtime": "python314",
+      "ignore": [
+        "venv",
+        ".venv",
+        "tests",
+        "local-debug",
+        "__pycache__",
+        ".pytest_cache",
+        "htmlcov",
+        ".coverage",
+        "requirements-dev.txt",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ]
+    }
+  ]
+}
