@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calculadora de CET — Case Técnico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topo">
+    <div class="conteudo">
+      <p class="sobretitulo">Desafio Técnico</p>
+      <h1>Cálculo de Custo Efetivo Total</h1>
+      <p class="subtitulo">
+        Informe as condições do empréstimo para ver a parcela mensal, o total pago e o CET real da operação.
+      </p>
+    </div>
+  </header>
+
+  <main class="conteudo">
+    <section class="cartao">
+      <form id="formulario" novalidate>
+        <div class="campos">
+          <label class="campo">
+            <span class="rotulo">Valor solicitado</span>
+            <div class="entrada">
+              <span class="prefixo">R$</span>
+              <input type="number" name="valor_solicitado" placeholder="20000" step="0.01" min="0.01" required>
+            </div>
+          </label>
+
+          <label class="campo">
+            <span class="rotulo">Taxa de juros mensal</span>
+            <div class="entrada">
+              <input type="number" name="taxa_juros_mensal" placeholder="2.5" step="0.01" min="0" required>
+              <span class="sufixo">% a.m.</span>
+            </div>
+          </label>
+
+          <label class="campo">
+            <span class="rotulo">Prazo</span>
+            <div class="entrada">
+              <input type="number" name="prazo" placeholder="24" step="1" min="1" required>
+              <span class="sufixo">meses</span>
+            </div>
+          </label>
+
+          <label class="campo">
+            <span class="rotulo">IOF</span>
+            <div class="entrada">
+              <input type="number" name="iof" placeholder="0.38" step="0.0001" min="0" required>
+              <span class="sufixo">%</span>
+            </div>
+          </label>
+
+          <label class="campo">
+            <span class="rotulo">Tarifa de cadastro</span>
+            <div class="entrada">
+              <span class="prefixo">R$</span>
+              <input type="number" name="tarifa_cadastrada" placeholder="150" step="0.01" min="0" required>
+            </div>
+          </label>
+        </div>
+
+        <div class="acoes">
+          <button type="submit" class="botao primario" id="btn-calcular">Calcular CET</button>
+          <button type="button" class="botao secundario" id="btn-historico">
+            Histórico <span class="contador" id="contador">0</span>
+          </button>
+        </div>
+
+        <p class="erro" id="erro" hidden></p>
+      </form>
+    </section>
+  </main>
+
+  <footer class="conteudo rodape">
+    <p>Requisições via <code>POST</code> para <code id="endpoint"></code></p>
+  </footer>
+
+  <!-- Modal de resultado -->
+  <dialog id="modal-resultado" class="modal">
+    <div class="modal-cabecalho">
+      <h2>Resultado do cálculo</h2>
+      <button type="button" class="fechar" data-fechar="modal-resultado" aria-label="Fechar">&times;</button>
+    </div>
+
+    <div class="modal-corpo">
+      <div class="destaque">
+        <div class="destaque-item">
+          <span class="destaque-rotulo">CET mensal</span>
+          <strong class="destaque-valor" id="r-cet-mensal">—</strong>
+        </div>
+        <div class="destaque-item">
+          <span class="destaque-rotulo">CET anual</span>
+          <strong class="destaque-valor" id="r-cet-anual">—</strong>
+        </div>
+      </div>
+
+      <dl class="detalhes">
+        <div><dt>Parcela mensal (PMT)</dt><dd id="r-pmt">—</dd></div>
+        <div><dt>Principal financiado</dt><dd id="r-principal">—</dd></div>
+        <div><dt>Valor total pago</dt><dd id="r-total">—</dd></div>
+        <div><dt>Custo da operação</dt><dd id="r-custo">—</dd></div>
+      </dl>
+
+      <p class="nota" id="r-nota"></p>
+    </div>
+
+    <div class="modal-rodape">
+      <button type="button" class="botao primario" data-fechar="modal-resultado">Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- Modal de histórico -->
+  <dialog id="modal-historico" class="modal">
+    <div class="modal-cabecalho">
+      <h2>Histórico de simulações</h2>
+      <button type="button" class="fechar" data-fechar="modal-historico" aria-label="Fechar">&times;</button>
+    </div>
+
+    <div class="modal-corpo">
+      <div id="lista-historico"></div>
+    </div>
+
+    <div class="modal-rodape">
+      <button type="button" class="botao secundario" id="btn-limpar">Limpar histórico</button>
+      <button type="button" class="botao primario" data-fechar="modal-historico">Fechar</button>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>

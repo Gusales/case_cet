@@ -1,0 +1,407 @@
+/* Identidade visual da apresentação técnica:
+   laranja #EC7000, fundos creme, texto quase-preto e Poppins. */
+
+:root {
+  --laranja: #EC7000;
+  --laranja-escuro: #C25D00;
+  --marrom: #8A4B2F;
+
+  --creme: #FDF7F2;
+  --creme-2: #FBF3EF;
+  --areia: #EEE3DA;
+  --areia-2: #E6D5CC;
+
+  --preto: #151515;
+  --grafite: #2A2A2A;
+  --cinza: #4A4A4A;
+  --cinza-claro: #8A8A8A;
+
+  --branco: #FFFFFF;
+  --vermelho: #C0392B;
+
+  --raio: 14px;
+  --sombra: 0 2px 4px rgba(21, 21, 21, .04), 0 12px 32px rgba(21, 21, 21, .07);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--creme);
+  color: var(--grafite);
+  font-family: "Poppins", "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+.conteudo {
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ---------- Topo ---------- */
+
+.topo {
+  background: var(--branco);
+  border-bottom: 1px solid var(--areia);
+  padding: 3rem 0 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.sobretitulo {
+  margin: 0 0 .35rem;
+  color: var(--laranja);
+  font-size: .78rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.topo h1 {
+  margin: 0;
+  color: var(--preto);
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  font-weight: 700;
+  letter-spacing: -.02em;
+  line-height: 1.15;
+}
+
+.topo h1::after {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 4px;
+  margin-top: 1rem;
+  background: var(--laranja);
+  border-radius: 2px;
+}
+
+.subtitulo {
+  max-width: 34rem;
+  margin: 1rem 0 0;
+  color: var(--cinza);
+  font-size: .95rem;
+}
+
+/* ---------- Cartão do formulário ---------- */
+
+.cartao {
+  background: var(--branco);
+  border: 1px solid var(--areia);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra);
+  padding: 2rem;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 1.25rem;
+}
+
+.campo { display: block; }
+
+.rotulo {
+  display: block;
+  margin-bottom: .45rem;
+  color: var(--grafite);
+  font-size: .82rem;
+  font-weight: 600;
+}
+
+.entrada {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  background: var(--creme-2);
+  border: 1.5px solid var(--areia-2);
+  border-radius: 10px;
+  padding: .1rem .85rem;
+  transition: border-color .15s, box-shadow .15s, background .15s;
+}
+
+.entrada:focus-within {
+  background: var(--branco);
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 3px rgba(236, 112, 0, .14);
+}
+
+.entrada input {
+  width: 100%;
+  padding: .7rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--preto);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.entrada input:focus { outline: none; }
+
+/* tira as setinhas do number, que atrapalham mais do que ajudam */
+.entrada input::-webkit-outer-spin-button,
+.entrada input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.entrada input[type=number] { -moz-appearance: textfield; }
+
+.prefixo, .sufixo {
+  flex-shrink: 0;
+  color: var(--cinza-claro);
+  font-size: .85rem;
+  font-weight: 500;
+}
+
+/* ---------- Botões ---------- */
+
+.acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.75rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--areia);
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  padding: .8rem 1.6rem;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+}
+
+.botao:active { transform: translateY(1px); }
+
+.primario { background: var(--laranja); color: var(--branco); }
+.primario:hover:not(:disabled) { background: var(--laranja-escuro); }
+
+.secundario { background: transparent; border-color: var(--areia-2); color: var(--grafite); }
+.secundario:hover:not(:disabled) { border-color: var(--laranja); color: var(--laranja); }
+
+.botao:disabled { opacity: .55; cursor: not-allowed; }
+
+.contador {
+  min-width: 1.4rem;
+  padding: .05rem .4rem;
+  border-radius: 999px;
+  background: var(--areia);
+  color: var(--cinza);
+  font-size: .74rem;
+  font-weight: 700;
+}
+
+.secundario:hover .contador { background: rgba(236, 112, 0, .14); color: var(--laranja); }
+
+/* ---------- Erro ---------- */
+
+.erro {
+  margin: 1.25rem 0 0;
+  padding: .85rem 1rem;
+  border-left: 3px solid var(--vermelho);
+  border-radius: 6px;
+  background: rgba(192, 57, 43, .07);
+  color: var(--vermelho);
+  font-size: .88rem;
+  font-weight: 500;
+}
+
+/* ---------- Rodapé ---------- */
+
+.rodape {
+  margin: 2.5rem auto 3rem;
+  color: var(--cinza-claro);
+  font-size: .8rem;
+}
+
+.rodape code {
+  background: var(--areia);
+  border-radius: 4px;
+  padding: .1em .4em;
+  color: var(--cinza);
+  font-size: .95em;
+  word-break: break-all;
+}
+
+/* ---------- Modais ---------- */
+
+.modal {
+  width: min(34rem, calc(100vw - 2rem));
+  padding: 0;
+  border: 1px solid var(--areia);
+  border-radius: var(--raio);
+  background: var(--branco);
+  color: var(--grafite);
+  box-shadow: 0 24px 64px rgba(21, 21, 21, .22);
+}
+
+.modal::backdrop { background: rgba(21, 21, 21, .5); }
+
+.modal-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem;
+  border-bottom: 1px solid var(--areia);
+}
+
+.modal-cabecalho h2 {
+  margin: 0;
+  color: var(--preto);
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.fechar {
+  border: 0;
+  background: transparent;
+  color: var(--cinza-claro);
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0 .25rem;
+  cursor: pointer;
+}
+
+.fechar:hover { color: var(--laranja); }
+
+.modal-corpo { padding: 1.5rem; max-height: 60vh; overflow-y: auto; }
+
+.modal-rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: .75rem;
+  padding: 1.15rem 1.5rem;
+  border-top: 1px solid var(--areia);
+  background: var(--creme-2);
+  border-radius: 0 0 var(--raio) var(--raio);
+}
+
+/* ---------- Resultado ---------- */
+
+.destaque {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.destaque-item {
+  padding: 1.1rem 1.2rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--laranja) 0%, #FF8A2B 100%);
+  color: var(--branco);
+}
+
+.destaque-rotulo {
+  display: block;
+  font-size: .74rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+
+.destaque-valor {
+  display: block;
+  margin-top: .2rem;
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+.detalhes { margin: 0; }
+
+.detalhes > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .8rem 0;
+  border-bottom: 1px dashed var(--areia);
+}
+
+.detalhes > div:last-child { border-bottom: 0; }
+
+.detalhes dt { color: var(--cinza); font-size: .88rem; }
+
+.detalhes dd {
+  margin: 0;
+  color: var(--preto);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: right;
+}
+
+.nota {
+  margin: 1.25rem 0 0;
+  padding: .85rem 1rem;
+  border-left: 3px solid var(--laranja);
+  border-radius: 6px;
+  background: var(--creme-2);
+  color: var(--cinza);
+  font-size: .84rem;
+}
+
+/* ---------- Histórico ---------- */
+
+.vazio {
+  margin: 0;
+  padding: 2rem 1rem;
+  color: var(--cinza-claro);
+  font-size: .9rem;
+  text-align: center;
+}
+
+.item {
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--areia);
+  border-radius: 10px;
+  background: var(--creme-2);
+  margin-bottom: .75rem;
+}
+
+.item:last-child { margin-bottom: 0; }
+
+.item-topo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: .5rem;
+}
+
+.item-titulo { color: var(--preto); font-size: .95rem; font-weight: 600; }
+
+.item-hora { color: var(--cinza-claro); font-size: .75rem; white-space: nowrap; }
+
+.item-entrada { color: var(--cinza); font-size: .8rem; margin-bottom: .6rem; }
+
+.item-saida {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.etiqueta {
+  padding: .25rem .6rem;
+  border-radius: 999px;
+  background: var(--areia);
+  color: var(--grafite);
+  font-size: .76rem;
+  font-weight: 600;
+}
+
+.etiqueta.destaque-cet { background: rgba(236, 112, 0, .14); color: var(--marrom); }
+
+@media (max-width: 34rem) {
+  .destaque { grid-template-columns: 1fr; }
+  .acoes .botao { flex: 1; }
+}
