@@ -23,6 +23,7 @@
 - [API](#-api)
 - [Testes](#-testes)
 - [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Documentação](#-documentação)
 
 ---
 
@@ -350,6 +351,16 @@ case_cet/
         ├── unit/                                    # Testes unitários (marker: unit)
         └── e2e/                                     # Cenários das personas (marker: e2e)
 ```
+
+---
+
+## 📚 Documentação
+
+| Documento | O que contém |
+| :--- | :--- |
+| [**Desafio**](docs/DESAFIO.md) | O enunciado original da entrevista técnica: parâmetros, fórmula da Tabela Price, definição do CET anualizado e o caso de referência |
+| [**Personas**](docs/PERSONAS.md) | Os dois casos de uso que guiam os testes — contexto, entradas, saídas esperadas e a derivação passo a passo de cada número, incluindo as alíquotas de IOF e a tarifa proporcional |
+| [**Uso de IA no desenvolvimento**](docs/USO_DE_IA_NO_DESENVOLVIMENTO.md) | Registro de como ferramentas de IA foram usadas ao longo do projeto |
 
 ---
 
